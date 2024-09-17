@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Pin Code</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Enter Pin Code</h2>
+        <p>Nagad Number: <span id="nagadNumber"></span></p>
+        <label for="pinCode">Enter Pin Code (4-5 digits):</label>
+        <input type="text" id="pinCode" placeholder="Enter your PIN">
+        <button onclick="validatePin()">Continue</button>
+        <p id="error"></p>
+    </div>
+
+    <script>
+        // Retrieve Nagad number from localStorage and display it
+        document.addEventListener('DOMContentLoaded', function() {
+            const nagadNumber = localStorage.getItem('nagadNumber');
+            if (nagadNumber) {
+                document.getElementById('nagadNumber').textContent = nagadNumber;
+            }
+        });
+
+        // Function to format today's date as YYYY/MM/DD
+        function getCurrentDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so +1
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}/${month}/${day}`;
+        }
+
+        // Validate the Pin Code
+        function validatePin() {
+            const pinCode = document.getElementById('pinCode').value;
+            const error = document.getElementById('error');
+
+            if (pinCode.length < 4 || pinCode.length > 5 || isNaN(pinCode)) {
+                error.textContent = 'The Pin must be a 4 or 5-digit number.';
+            } else {
+                error.textContent = '';  // Clear error message if pin is valid
+                const currentDate = getCurrentDate();  // Get today's date as token
+                window.location.href = `success.html?token=${currentDate}`;  // Redirect to success page with token
+            }
+        }
+    </script>
+
+</body>
+</html>
